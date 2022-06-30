@@ -30,10 +30,10 @@
 <script>
     const start = document.getElementById("start");
     start.addEventListener("click", function () {
-        start.remove()
-        const canvas = document.createElement("canvas")
-        canvas.classList.add("square")
-        document.body.appendChild(canvas)
+        start.remove();
+        const canvas = document.createElement("canvas");
+        canvas.classList.add("square");
+        document.body.appendChild(canvas);
         const ctx = canvas.getContext("2d");
         let rect = canvas.getBoundingClientRect();
 
@@ -42,16 +42,12 @@
             ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
             ctx.fillStyle = color;
             ctx.fill();
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = color;
-            ctx.stroke();
         }
 
         function draw() {
             rect = canvas.getBoundingClientRect();
             canvas.width = rect.width;
             canvas.height = rect.height;
-
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             let radius = rect.height / 2 - 10;
@@ -66,27 +62,25 @@
             }
         }
 
-        new ResizeObserver(draw).observe(canvas);
-
+        new ResizeObserver(draw).observe(document.body);
 
         const audioCtx = new AudioContext();
-        const oscillator = audioCtx.createOscillator()
-        const gain = audioCtx.createGain()
-        oscillator.type = 'sine'
-        oscillator.connect(gain)
+        const oscillator = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.connect(gain);
         oscillator.frequency.value = 100;
-        gain.connect(audioCtx.destination)
-        const vol  = 0.1
+        gain.connect(audioCtx.destination);
+        const vol = 0.1;
         gain.gain.value = vol;
         gain.gain.minValue = vol;
         gain.gain.maxValue = vol;
-        oscillator.start(0)
-
+        oscillator.start(0);
 
         canvas.addEventListener("mousemove", function (e) {
             let [x, y] = [e.clientX - rect.left, e.clientY - rect.top];
             let pixel = ctx.getImageData(x, y, 1, 1).data;
-            let intensity = (1.0/256) * pixel[0]
+            let intensity = (1.0 / 256) * pixel[0];
             oscillator.frequency.value = 100 + 200 * intensity;
         });
 
