@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        body, .square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .square {
+            width: 100vmin;
+            height: 100vmin;
+        }
+    </style>
+    <title>Blind shot</title>
+</head>
+<body>
+<button id="start" class="square">click to start</button>
+<script>
+    const start = document.getElementById("start");
+    start.addEventListener("click", function () {
+        start.remove()
+        const canvas = document.createElement("canvas")
+        canvas.classList.add("square")
+        document.body.appendChild(canvas)
+        const ctx = canvas.getContext("2d");
+        let rect = canvas.getBoundingClientRect();
+
+        function circle(x, y, radius, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = color;
+            ctx.stroke();
+        }
+
+        function draw() {
+            rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            let radius = rect.height / 2 - 10;
+            let step = radius / 10;
+            let colorStep = 256 / 10;
+            let [r, g, b] = [0, 0, 0];
+
+            for (let i = 0; i < 10; i++) {
+                circle(centerX, centerY, radius, `rgb(${r}, ${g}, ${b})`);
+                radius -= step;
+                [r, g, b] = [r + colorStep, g + colorStep, b + colorStep];
+            }
+        }
+
+        new ResizeObserver(draw).observe(canvas);
+
+
+        const audioCtx = new AudioContext();
+        const oscillator = audioCtx.createOscillator()
+        const gain = audioCtx.createGain()
+        oscillator.type = 'sine'
+        oscillator.connect(gain)
+        oscillator.frequency.value = 100;
+        gain.connect(audioCtx.destination)
+        const vol  = 0.1
+        gain.gain.value = vol;
+        gain.gain.minValue = vol;
+        gain.gain.maxValue = vol;
+        oscillator.start(0)
+
+
+        canvas.addEventListener("mousemove", function (e) {
+            let [x, y] = [e.clientX - rect.left, e.clientY - rect.top];
+            let pixel = ctx.getImageData(x, y, 1, 1).data;
+            let intensity = (1.0/256) * pixel[0]
+            oscillator.frequency.value = 100 + 200 * intensity;
+        });
+
+        canvas.addEventListener("mouseup", function (e) {
+            let [x, y] = [e.clientX - rect.left, e.clientY - rect.top];
+            circle(x, y, 10, "rgb(256, 0, 0)");
+        });
+    });
+</script>
+</body>
+</html>
