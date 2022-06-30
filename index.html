@@ -26,11 +26,10 @@
     <title>Blind shot</title>
 </head>
 <body>
-<button id="start" class="square">click to start</button>
+<button id="start" onclick="start(this)" class="square">click to start</button>
 <script>
-    const start = document.getElementById("start");
-    start.addEventListener("click", function () {
-        start.remove();
+    function start(btn) {
+        btn.remove();
         const canvas = document.createElement("canvas");
         canvas.classList.add("square");
         document.body.appendChild(canvas);
@@ -51,8 +50,8 @@
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             let radius = rect.height / 2 - 10;
-            let step = radius / 10;
-            let colorStep = 256 / 10;
+            const step = radius / 10;
+            const colorStep = 256 / 10;
             let [r, g, b] = [0, 0, 0];
 
             for (let i = 0; i < 10; i++) {
@@ -71,24 +70,20 @@
         oscillator.connect(gain);
         oscillator.frequency.value = 100;
         gain.connect(audioCtx.destination);
-        const vol = 0.1;
-        gain.gain.value = vol;
-        gain.gain.minValue = vol;
-        gain.gain.maxValue = vol;
+        gain.gain.value = 0.1;
         oscillator.start(0);
 
         canvas.addEventListener("mousemove", function (e) {
-            let [x, y] = [e.clientX - rect.left, e.clientY - rect.top];
-            let pixel = ctx.getImageData(x, y, 1, 1).data;
-            let intensity = (1.0 / 256) * pixel[0];
-            oscillator.frequency.value = 100 + 200 * intensity;
+            const [x, y] = [e.clientX - rect.left, e.clientY - rect.top];
+            const pixel = ctx.getImageData(x, y, 1, 1).data;
+            oscillator.frequency.value = 100 + 200 * (1.0 / 256) * pixel[0];
         });
 
         canvas.addEventListener("mouseup", function (e) {
-            let [x, y] = [e.clientX - rect.left, e.clientY - rect.top];
+            const [x, y] = [e.clientX - rect.left, e.clientY - rect.top];
             circle(x, y, 10, "rgb(256, 0, 0)");
         });
-    });
+    }
 </script>
 </body>
 </html>
